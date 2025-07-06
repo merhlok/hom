@@ -16,11 +16,11 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from app.views import home_view, time_view, workdir_view  
+from app.views import cook
+from app_bus.views import bus_stations
 
 urlpatterns = [
-    path('', home_view, name='home'),
-    path('current_time/', time_view, name='time'),
-    path('workdir/', workdir_view, name='workdir'),
+    path('bus/',bus_stations, name='bus_stations'),
+    path('recipe/<str:name>/<int:count>/',cook , name='cook'),
     path('admin/', admin.site.urls),
 ]

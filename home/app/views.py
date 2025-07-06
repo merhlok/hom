@@ -1,37 +1,31 @@
 from django.http import HttpResponse
 from django.shortcuts import render, reverse
-import datetime
-import os
 
-def home_view(request):
-    template_name = 'app/home.html'
+DATA = {
+    'omlet': {
+        'яйца, шт': 2,
+        'молоко, л': 0.1,
+        'соль, ч.л.': 0.5,
+    },
+    'pasta': {
+        'макароны, г': 0.3,
+        'сыр, г': 0.05,
+    },
+    'buter': {
+        'хлеб, ломтик': 1,
+        'колбаса, ломтик': 1,
+        'сыр, ломтик': 1,
+        'помидор, ломтик': 1,
+    },
+}
 
-    pages = {
-        'Главная страница': reverse('home'),
-        'Показать текущее время': reverse('time'),
-        'Показать содержимое рабочей директории': reverse('workdir')
-    }
+def cook(request, name, count=1):
+    if name in DATA:
+        recipe = DATA[name].copy()
+        for ingredient in recipe:
+            recipe[ingredient] *= count
+        context = {'page': recipe}
+    else:
+        context = {'page': {}}
     
-    # context и параметры render менять не нужно
-    # подбробнее о них мы поговорим на следующих лекциях
-    context = {
-        'pages': pages
-    }
-    return render(request, template_name, context)
-
-
-def time_view(request):
-    # обратите внимание – здесь HTML шаблона нет, 
-    # возвращается просто текст
-    current_time = datetime.time()
-    msg = f'Текущее время: {current_time}'
-    return HttpResponse(msg)
-
-
-def workdir_view(request):
-    msg=''
-    for root, dirs, files in os.walk("."):  
-        for filename in files:
-            msg +=filename 
-
-    return HttpResponse(msg)
+    return render(request, 'home.html', context)
