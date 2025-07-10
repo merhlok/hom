@@ -1,31 +1,48 @@
-from django.http import HttpResponse
-from django.shortcuts import render, reverse
+from django.http import Http404
+from django.shortcuts import render
 
-DATA = {
-    'omlet': {
-        'яйца, шт': 2,
-        'молоко, л': 0.1,
-        'соль, ч.л.': 0.5,
-    },
-    'pasta': {
-        'макароны, г': 0.3,
-        'сыр, г': 0.05,
-    },
-    'buter': {
-        'хлеб, ломтик': 1,
-        'колбаса, ломтик': 1,
-        'сыр, ломтик': 1,
-        'помидор, ломтик': 1,
-    },
-}
+from app.models import Car
 
-def cook(request, name, count=1):
-    if name in DATA:
-        recipe = DATA[name].copy()
-        for ingredient in recipe:
-            recipe[ingredient] *= count
-        context = {'page': recipe}
-    else:
-        context = {'page': {}}
+
+from django.http import Http404
+from django.shortcuts import render
+
+from app.models import Car
+
+def cars_list_view(request):
+    cars = Car.objects.all()
+    context = {
+        'cars': cars,
+        'total_cars': cars.count(),
+    }
     
-    return render(request, 'home.html', context)
+    return render(request, 'main/list.html', context)
+
+def car_details_view(request, car_id):
+    try:
+        car = Car.objects.get(id=car_id)
+        sales = car.sales.all()
+        context = {
+            'car': car,
+            'car_age': car.year,
+            'recent_sales': sales,
+        }
+        
+        return render(request, 'main/details.html', context)
+        
+    except Car.DoesNotExist:
+        raise Http404('Автомобиль не найден')
+
+def sales_by_car(request, car_id):
+    try:
+        car = Car.objects.get(id=car_id)
+        sales = car.sales.all().order_by('-created_at')
+        context = {
+            'car': car,
+            'sales': sales,
+        }
+        
+        return render(request, 'main/sales.html', context)
+        
+    except Car.DoesNotExist:
+        raise Http404('Автомобиль не найден')
