@@ -1,20 +1,17 @@
 from django.contrib import admin
 
-from django.contrib import admin
-from app.models import Car, Sale, Client
+# Register your models here.
+from .models import Product, Review
 
-@admin.register(Car)
-class CarAdmin(admin.ModelAdmin):
-    list_display = ('model', 'year', 'price', 'fuel_type')
-    list_filter = ('year', 'body_type', 'fuel_type')
-    search_fields = ('model',)
 
-@admin.register(Sale)
-class SaleAdmin(admin.ModelAdmin):
-    list_display = ('car', 'client', 'created_at')
-    list_filter = ('created_at',)
-    date_hierarchy = 'created_at'
+class ReviewInline(admin.TabularInline):
+    model = Review
+    fields = ['text', 'mark']
 
-@admin.register(Client)
-class ClientAdmin(admin.ModelAdmin):
-    list_display = ('name', 'phone', 'email')
+
+class ProductAdmin(admin.ModelAdmin):
+    inlines = [ReviewInline]
+    list_display = ['id', 'title', 'price']
+
+
+admin.site.register(Product, ProductAdmin)
