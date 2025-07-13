@@ -1,32 +1,17 @@
 from django.db import models
 
 
-VERY_BAD = 1
-BAD = 2
-SATISFACTORY = 3
-GOOD = 4
-PERFECT = 5
-
-MARK_CHOICES = (
-    (VERY_BAD, "Очень плохо"),
-    (BAD, "Плохо"),
-    (SATISFACTORY, "Удовлетворительно"),
-    (GOOD, "Хорошо"),
-    (PERFECT, "Отлично")
-)
-
-
-class Product(models.Model):
-    title = models.CharField(max_length=100)
-    description = models.TextField()
-    price = models.DecimalField(max_digits=10, decimal_places=2)
+class Book(models.Model):
+    author = models.CharField(max_length=50, verbose_name='Автор')
+    title = models.CharField(max_length=100, verbose_name='Название произведения')
+    year = models.PositiveSmallIntegerField(verbose_name='Год публикации')
 
     def __str__(self):
-        return self.title
+        return f'{self.author} - {self.title}'
 
 
-class Review(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='comments')
-    text = models.TextField()
-    mark = models.PositiveSmallIntegerField(choices=MARK_CHOICES)
-    created_at = models.DateTimeField(auto_now_add=True)
+class Order(models.Model):
+    user_name = models.CharField(max_length=200, verbose_name='ФИО')
+    days_count = models.PositiveSmallIntegerField(default=1, verbose_name='Количество дней заказа')
+    date = models.DateField(auto_now_add=True, verbose_name='Дата')
+    books = models.ManyToManyField(Book)
